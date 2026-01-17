@@ -1,1 +1,235 @@
 # Context-Aware-Conversational-AI-Assistant
+
+# AI Memory Agent
+
+---
+
+## Project Overview
+
+AI Memory Agent is a conversational AI system with long-term, semantic memory. It leverages LangChain, ChromaDB, and Google Gemini (or OpenAI) to remember facts, preferences, and context from user interactions, enabling personalized and coherent conversations over time. The project features a Streamlit web interface for chat and memory visualization, and is designed for extensibility (voice input, advanced prompts, etc.).
+
+---
+
+## Features
+
+- **Conversational Agent:** Interacts with users via text chat in a natural, friendly manner.
+- **Semantic Memory:** Stores and retrieves information based on meaning, not just keywords.
+- **User-Scoped Memory:** Each user's memories are isolated by a unique user ID, supporting multi-user scenarios.
+- **Memory Visualization:** Sidebar panel shows all stored memories for the current user, updating in real time.
+- **Memory Clearing:** Easily reset all memories for a user via the UI, with confirmation for safety.
+- **Extensible:** Ready for voice input (Whisper), advanced prompt engineering, and more.
+
+---
+
+## Architecture & Flow
+
+### High-Level Design
+
+1. **User interacts via Streamlit chat UI.**
+2. **Agent receives input, parses for important facts or questions.**
+3. **If new info is detected:**
+   - Agent uses LangChain tool to save memory (stores semantic embedding + metadata in ChromaDB).
+4. **If recall is needed:**
+   - Agent uses LangChain tool to retrieve relevant memories (semantic search in ChromaDB).
+5. **Agent responds, optionally using retrieved memories for context.**
+6. **Sidebar updates in real time to show all stored memories for the user.**
+
+### Memory Mechanism Explained
+
+- **Semantic Embeddings:** Text is converted to high-dimensional vectors using Gemini or OpenAI, capturing meaning beyond keywords.
+- **ChromaDB Vector Store:** Stores embeddings and metadata, allowing fast semantic search and retrieval.
+- **User ID Scoping:** Each memory is tagged with a user ID, so multiple users can have isolated memory banks.
+- **LangChain Tools:** Custom tools (`save_user_memory`, `retrieve_user_memories`) let the agent interact with the memory store.
+
+---
+
+## Tech Stack
+
+- **Backend:** Python
+- **AI Framework:** LangChain
+- **LLM:** Google Gemini (default, free tier) or OpenAI GPT (optional)
+- **Vector Database:** ChromaDB
+- **Frontend:** Streamlit
+- **Environment:** `.env` for API keys
+
+---
+
+## Project Structure
+
+```
+memory_agent_project/
+├── src/
+│   ├── memory_tool.py         # Memory management logic and LangChain tools
+│   ├── test_memory_agent.py   # Script to test agent memory functions
+│   └── streamlit_app.py       # Streamlit web app
+├── docs/
+│   ├── ui_design.md           # UI design documentation
+│   ├── Evaluation_Plan.md     # Evaluation scenarios and metrics
+│   ├── prompts.md             # Agent prompt documentation
+│   └── Voice_Integration.md   # Guide for adding voice input
+├── requirements.txt           # Python dependencies
+├── .env.example               # Example environment variables
+├── .gitignore                 # Git ignore file
+└── README.md                  # Project overview and instructions
+```
+
+---
+
+## Setup Instructions
+
+### 1. Clone the Repository
+
+```powershell
+git clone https://github.com/Nickfuse21/AI-Memory-Agent.git
+cd AI-Memory-Agent/memory_agent_project
+```
+
+### 2. Create a Python Virtual Environment
+
+```powershell
+python -m venv venv
+```
+
+### 3. Activate the Virtual Environment
+
+**Windows:**
+```powershell
+venv\Scripts\activate
+```
+**macOS/Linux:**
+```bash
+source venv/bin/activate
+```
+
+### 4. Install Dependencies
+
+```powershell
+pip install -r requirements.txt
+```
+
+### 5. Configure API Keys
+
+Copy `.env.example` to `.env` and add your API key(s):
+
+- For Gemini:
+  ```
+  GOOGLE_API_KEY="your-google-gemini-api-key-here"
+  ```
+- For OpenAI (optional):
+  ```
+  OPENAI_API_KEY="your-openai-api-key-here"
+  ```
+
+---
+
+## Usage Guide
+
+### 1. Run Core Logic Test
+
+```powershell
+cd src
+python test_memory_agent.py
+```
+This script demonstrates saving and retrieving user memories, and prints results to the console.
+
+### 2. Launch the Streamlit App
+
+```powershell
+cd src
+streamlit run streamlit_app.py
+```
+Interact with the agent, view and clear memories in the sidebar.
+
+---
+
+## UI Walkthrough
+
+1. **Main Chat Area:**
+   - Type messages to the agent.
+   - See conversation history with clear user/AI labels.
+2. **Sidebar (Memory Debug Panel):**
+   - View all stored memories for your user ID.
+   - Clear all memories for a fresh start (with confirmation).
+   - See real-time updates as you interact.
+
+### Example Inputs
+
+- "My name is Alex."
+- "I love hiking."
+- "What is my name?"
+- "Do I enjoy hiking?"
+- "Clear all memories" (use sidebar button)
+
+---
+
+## Memory Mechanism Deep Dive
+
+1. **Information Extraction:**
+   - The agent parses user input for facts, preferences, or context.
+   - Example: "My favorite color is blue." → fact to remember.
+2. **Embedding Generation:**
+   - Text is converted to a vector using Gemini/OpenAI embeddings.
+   - Similar meanings produce similar vectors.
+3. **Storage:**
+   - Vector and metadata (user ID, context) are stored in ChromaDB.
+4. **Retrieval:**
+   - When you ask a recall question, the agent embeds your query and searches for semantically similar memories.
+   - Example: "Do I like outdoor activities?" matches "I love hiking."
+5. **Context Augmentation:**
+   - Retrieved memories are fed back to the LLM to generate more informed, personalized responses.
+
+---
+
+## Evaluation & Testing
+
+See [`docs/Evaluation_Plan.md`](docs/Evaluation_Plan.md) for scenario-based tests and success metrics. Example test cases:
+- Teach the agent your name and preferences.
+- Ask recall questions ("What is my name?", "Do I like hiking?").
+- Clear memories and verify recall fails.
+
+---
+
+## UI Design Details
+
+See [`docs/ui_design.md`](docs/ui_design.md) for details. The app features:
+- Main chat area for conversation
+- Sidebar for memory visualization and clearing
+- Real-time updates of stored memories
+
+---
+
+## Advanced & Future Work
+
+- **Voice Input:** See [`docs/Voice_Integration.md`](docs/Voice_Integration.md) for adding Whisper-based speech-to-text.
+- **Prompt Engineering:** Customize agent behavior via [`docs/prompts.md`](docs/prompts.md).
+- **Extensibility:** Add new tools, memory types, or LLMs as needed.
+
+---
+
+## Troubleshooting & Best Practices
+
+- **Missing Files in Repo:** Ensure all files are at the repo root before pushing.
+- **API Key Issues:** Double-check `.env` for correct keys and spelling.
+- **Dependency Errors:** Run `pip install -r requirements.txt` in your activated virtual environment.
+- **Streamlit Issues:** Make sure Streamlit is installed and your virtual environment is active.
+- **ChromaDB Deprecation Warnings:** Use the latest LangChain/ChromaDB versions and follow migration guides if needed.
+
+---
+
+## Contributing
+
+Pull requests and issues are welcome! Please fork the repo and submit changes via PR.
+
+---
+
+## License
+
+MIT License
+
+---
+
+## Credits
+
+Project created and maintained by **Nikhil Pratap Singh** ([Nickfuse21](https://github.com/Nickfuse21)).
+
+For questions, contact: nikhilpratap5683@gmail.com
